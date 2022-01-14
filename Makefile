@@ -18,14 +18,14 @@ NAME = pipex
 
 AR = ar rcs
 
-SRCS =  commandexecution.c freeingplace.c getpath.c pipex.c single_redirection.c
+SRCS =  check_access.c command_executions.c make_command_arrays.c pipex.c single_redirection.c
 
 OBJS = $(SRCS:.c=.o)
 
 all: $(OBJS)
 	$(MAKE) -C Libft
 	$(AR) $(NAME).a $(OBJS)
-	$(CC) $(CFLAGS) -o $(NAME) pipex.a ./Libft/libft.a
+	$(CC) $(CFLAGS) -o $(NAME) pipex.a ./Libft/libft.a 
 
 $(OBJS):
 	$(CC) $(CFLAGS) -c $(SRCS)

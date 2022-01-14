@@ -1,44 +1,31 @@
 #include "pipex.h"
 
-char	**makecommandarg(char *command, char **env)
+int	single_redirection(pipex_info *info)
 {
-	char	*temp1;
-	char	*temp2;
-	char	**out;
-
-	temp1 = getpath(command, env);
-	if ((temp2 = ft_strchr(command, ' ')))
-	{
-		temp2 = ft_strjoin(temp1, temp2 + 1);
-		out = ft_split(temp2, ' ');
-		free(temp2);
-	}
-	else
-		out = ft_split(temp1, ' ');
-	free(temp1);
-	return (out);
-}
-
-
-char	*single_redirection(int argc, char **argv, char **env)
-{
+	int		ret;
 	int		ind;
-	int		infd;
-	int		outfd;
-	char	**commandarguments;
-
-	outfd = open(argv[argc - 1], O_WRONLY | O_CREAT,  0777);
-	infd = open(argv[1], O_RDONLY);
-	ind = 2;
-	while (ind < argc - 2)
+	
+	ind = 0;
+	ret = make_command_arrays(info, info->command_arrays);
+	if (ret != 0)
+		return (-1);
+	ret = check_access(info->command_arrays);
+	if (ret != 0)
+		return (-1);
+	while (ind < (info->argc - 4))
 	{
-		commandarguments = makecommandarg(argv[ind], env);
-		infd = commandexecution(commandarguments[0], commandarguments, infd, env);
-		freecommandarguments(commandarguments);
+		// printf("this is in beginning info->infile: %d\n", info->infile);
+		// printf("this is in beginning info->outfile: %d\n", info->outfile);
+		// printf("ind: %d  <  info->argc -2 :%d\n", ind, (info->argc-2));
+		info->infile = execute_commands(info->command_arrays[ind], info);
+		// printf("this is info->infile: %d\n", info->infile);
+		if (info->infile < 0)
+			return (-1);
 		ind++;
 	}
-	commandarguments = makecommandarg(argv[ind], env);
-	lastcommand(commandarguments, infd, outfd, env);
-	freecommandarguments(commandarguments);
-	return ("abc");
+	ret = last_command(info->command_arrays[ind], info);
+	// free(info->command_arrays);
+	// printf("sfdioisdfjiosdijiojfsdiojfsd\n\n");
+	// printf("This is info->error: %d\n", info->error);
+	return (ret);
 }
